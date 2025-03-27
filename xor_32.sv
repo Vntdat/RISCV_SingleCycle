@@ -5,5 +5,4 @@ module xor_32 (
 	);
 
 	assign c = a^b;
-	
 endmodule
