@@ -1,12 +1,11 @@
 module fulladder_32(
 	input logic [31:0] a,
 	input logic [31:0] b,
-	input logic c_in,
 	output logic [31:0] sum
 	);
 	
 	logic [32:0] carry; 
-	assign carry[0]=c_in;
+	assign carry[0]=0;
 	
 	full_adder fa0  (.a(a[0]),  .b(b[0]),  .cin(carry[0]),  .sum(sum[0]),  .cout(carry[1]));
 	full_adder fa1  (.a(a[1]),  .b(b[1]),  .cin(carry[1]),  .sum(sum[1]),  .cout(carry[2]));
