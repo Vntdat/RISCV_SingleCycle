@@ -16,7 +16,24 @@ module alu (
 	logic [31:0] o_sll;
 	logic [31:0] o_srl;
 	logic [31:0] o_sral;
-	
+	logic [31:0] mux_inputs [15:0];
+
+	assign mux_inputs[0]  = o_add;
+	assign mux_inputs[1]  = o_sub;
+	assign mux_inputs[2]  = o_slt;
+	assign mux_inputs[3]  = o_sltu;
+	assign mux_inputs[4]  = o_xor;
+	assign mux_inputs[5]  = o_or;
+	assign mux_inputs[6]  = o_and;
+	assign mux_inputs[7]  = o_sll;
+	assign mux_inputs[8]  = o_srl;
+	assign mux_inputs[9]  = o_sra;
+	assign mux_inputs[10] = 32'b0;  // Giá trị mặc định cho các trường hợp chưa sử dụng
+	assign mux_inputs[11] = 32'b0;
+	assign mux_inputs[12] = 32'b0;
+	assign mux_inputs[13] = 32'b0;
+	assign mux_inputs[14] = 32'b0;
+	assign mux_inputs[15] = 32'b0;
 	fulladder_32 ADD (.a (i_op_a),
 							.b (i_op_b),
 							.c_in (c_in), //note
@@ -58,25 +75,6 @@ module alu (
 	sra_32 SRA (.a (i_op_a),
 					.b (i_op_b),
 					.c (o_sra));
-					
-	logic [31:0] mux_inputs [15:0];
-
-	assign mux_inputs[0]  = o_add;
-	assign mux_inputs[1]  = o_sub;
-	assign mux_inputs[2]  = o_slt;
-	assign mux_inputs[3]  = o_sltu;
-	assign mux_inputs[4]  = o_xor;
-	assign mux_inputs[5]  = o_or;
-	assign mux_inputs[6]  = o_and;
-	assign mux_inputs[7]  = o_sll;
-	assign mux_inputs[8]  = o_srl;
-	assign mux_inputs[9]  = o_sra;
-	assign mux_inputs[10] = 32'b0;  // Giá trị mặc định cho các trường hợp chưa sử dụng
-	assign mux_inputs[11] = 32'b0;
-	assign mux_inputs[12] = 32'b0;
-	assign mux_inputs[13] = 32'b0;
-	assign mux_inputs[14] = 32'b0;
-	assign mux_inputs[15] = 32'b0;
 
     mux16_1 MUX (.in(mux_inputs),
 						.sel(i_alu_op),
