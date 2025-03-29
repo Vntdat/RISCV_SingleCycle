@@ -13,7 +13,7 @@ module comparator_32bit (
     assign b_sign = b[31];
 
     // Phép trừ a - b
-    sub_32 sub_inst (
+    sub_32 sub (
         .a(a),
         .b(b),
         .s(sub_result),
