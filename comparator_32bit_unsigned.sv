@@ -1,6 +1,6 @@
 module comparator_32bit_unsigned(
-    input logic [31:0] a, b,    // Hai sá»‘ cáº§n so sÃ¡nh
-    output logic a_lt_b         // a < b
+    input logic [31:0] a, b,   
+    output logic a_lt_b       
 );
     logic [31:0] sub_result;
     logic borrow;
@@ -9,9 +9,8 @@ module comparator_32bit_unsigned(
         .a(a),
         .b(b),
         .s(sub_result),
-        .c_out(borrow) // borrow = 0 náº¿u a < b
+        .c_out(borrow) 
     );
 
-    assign a_lt_b = ~borrow;  // Náº¿u cÃ³ mÆ°á»£n (borrow = 0) thÃ¬ a < b
-
+    assign a_lt_b = ~borrow; 
 endmodule
