@@ -42,6 +42,7 @@ module controlunit (
 					opa_sel = 1'b0;
 					opb_sel = 1'b1;
 					wb_sel  = 2'b01;
+					insn_vld  = 1'b0;
 								case  (fun3)
 										3'b000: begin
 															case  (fun7)
@@ -70,6 +71,7 @@ module controlunit (
 					opa_sel = 1'b0;
 					opb_sel = 1'b1;
 					wb_sel  = 2'b01;
+					insn_vld  = 1'b0;
 									case (fun3)
 											3'b000: alu_op = 4'b0000; // lenh ADDI
 											3'b001: alu_op = 4'b0111; // lenh SLLI
@@ -92,6 +94,7 @@ module controlunit (
 								opb_sel  = 1'b0;
 								rd_wren  = 1'b0;
 								mem_wren = 1'b0;
+								insn_vld  = 1'b0;
 									case (fun3)
 											3'b000: begin 						//lenh BEQ: nhay neu bang khong dau
 													br_un = 1'b0;  			// khong dau
@@ -127,6 +130,7 @@ module controlunit (
 					opb_sel  = 1'b1;
 					mem_wren = 1'b1;
 					wb_sel   = 2'b10;
+					insn_vld  = 1'b0;
 							 end
 				// I_Format lenh Load doc du leu tu LSU
 				5'b00000: begin
@@ -136,6 +140,7 @@ module controlunit (
 					opb_sel  = 1'b0;
 					mem_wren = 1'b0;
 					wb_sel   = 2'b10;	
+					insn_vld  = 1'b0;
 							 end			
 				//U_Format lenh nhay khong dieu kien
 				5'b11011: begin   //lenh JAL
@@ -145,6 +150,7 @@ module controlunit (
 					opb_sel  = 1'b0;
 					mem_wren = 1'b0;
 					wb_sel   = 2'b00;
+					insn_vld  = 1'b0;
 							 end
 				5'b11001: begin 	//lenh JALR
 					pc_sel   = 1'b1;
@@ -153,6 +159,7 @@ module controlunit (
 					opb_sel  = 1'b0;
 					mem_wren = 1'b0;
 					wb_sel   = 2'b00;
+					insn_vld  = 1'b0;
 							end
 				//I_Format 
 				//lenh LUI
@@ -161,6 +168,7 @@ module controlunit (
 					rd_wren  = 1'b1;
 					mem_wren = 1'b0;
 					wb_sel   = 2'b11;  // sửa ở trong hình anh Hải cho thêm phần nối từ immgen đến mux 4 sang 1
+					insn_vld  = 1'b0;
 						end
 				//lenh AUIPC
 				5'b00101: begin
@@ -170,6 +178,7 @@ module controlunit (
 					opb_sel  = 1'b0;
 					mem_wren = 1'b0;
 					wb_sel   = 2'b00;
+					insn_vld  = 1'b0;
 						end
 			endcase
 	end
