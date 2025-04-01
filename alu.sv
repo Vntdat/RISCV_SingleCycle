@@ -4,8 +4,8 @@ module alu (
 	input logic [3:0] i_alu_op,
 	output logic [31:0] o_alu_data
 	);
-	
-	logic c_out;
+
+	logic cout;
 	logic [31:0] o_add;
 	logic [31:0] o_sub;
 	logic [31:0] o_slt;
@@ -36,13 +36,12 @@ module alu (
 	assign mux_inputs[15] = 32'b0;
 	fulladder_32 ADD (.a (i_op_a),
 							.b (i_op_b),
-							.c_in (c_in), //note
 							.sum (o_add));
 							
 	sub_32 SUB (.a (i_op_a),
 					.b (i_op_b),
 					.s (o_sub),
-					.c_out (c_out)); //note
+					.cout (cout)); //note
 						
 	comparator_32bit SLT (.a (i_op_a),
 								 .b (i_op_b),
