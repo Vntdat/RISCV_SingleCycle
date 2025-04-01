@@ -15,7 +15,7 @@ module alu (
 	logic [31:0] o_and;
 	logic [31:0] o_sll;
 	logic [31:0] o_srl;
-	logic [31:0] o_sral;
+	logic [31:0] o_sra;
 	logic [31:0] mux_inputs [15:0];
 
 	assign mux_inputs[0]  = o_add;
