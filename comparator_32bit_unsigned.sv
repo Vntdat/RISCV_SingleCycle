@@ -9,7 +9,7 @@ module comparator_32bit_unsigned(
         .a(a),
         .b(b),
         .s(sub_result),
-        .c_out(borrow) 
+        .cout(borrow) 
     );
 
     assign a_lt_b = ~borrow; 
