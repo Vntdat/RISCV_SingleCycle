@@ -1,12 +1,12 @@
 module full_adder (
 	input logic a,
 	input logic b,
-	input logic c_in,
+	input logic cin,
 	output logic sum,
-	output logic c_out
+	output logic cout
 	);
 	
-	assign sum = a^b^c_in;
-	assign c_out = (a&b) | c_in&(a^b); 
+	assign sum = a^b^cin;
+	assign cout = (a&b) | cin&(a^b); 
 	
 endmodule
