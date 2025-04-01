@@ -12,7 +12,7 @@ module memory (
 
     // Đọc file dữ liệu/mã lệnh
     initial begin
-		$readmemh("D:/HCMUT/HK242/CTMT/RISCV_SingleCycle/memory_init.mem.txt", mem);
+		$readmemh("memory_init.mem.txt", mem);
     end
 
     // Đọc không đồng bộ
