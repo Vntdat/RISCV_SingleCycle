@@ -1,0 +1,205 @@
+# Reading C:/altera/13.0sp1/modelsim_ase/tcl/vsim/pref.tcl 
+# Loading project testtttt
+# reading C:\altera\13.0sp1\modelsim_ase\win32aloem/../modelsim.ini
+# Loading project test_controlunit
+# Compile of controlunit.sv was successful.
+# Compile of controlunit_tb.sv was successful.
+# 2 compiles, 0 failed with no errors. 
+vsim -gui work.controlunit_tb
+# vsim -gui work.controlunit_tb 
+# Loading sv_std.std
+# Loading work.controlunit_tb
+# Loading work.controlunit
+add wave -position insertpoint  \
+sim:/controlunit_tb/i_instr \
+sim:/controlunit_tb/br_less \
+sim:/controlunit_tb/br_equal \
+sim:/controlunit_tb/pc_sel \
+sim:/controlunit_tb/rd_wren \
+sim:/controlunit_tb/br_un \
+sim:/controlunit_tb/opa_sel \
+sim:/controlunit_tb/opb_sel \
+sim:/controlunit_tb/mem_wren \
+sim:/controlunit_tb/insn_vld \
+sim:/controlunit_tb/alu_op \
+sim:/controlunit_tb/wb_sel
+run -all
+# ======================================
+#   FULL RISC-V CONTROL UNIT TESTBENCH  
+# ======================================
+# 
+# ==== 1. Testing R-type Instructions (12) ====
+# 
+# Testing ADD instruction:
+# Input instruction: 00000000000000000000000000110011
+# ADD instruction PASSED!
+# 
+# Testing SUB instruction:
+# Input instruction: 01000000000000000000000000110011
+# SUB instruction PASSED!
+# 
+# Testing AND instruction:
+# Input instruction: 00000000000000000111000000110011
+# AND instruction PASSED!
+# 
+# Testing OR instruction:
+# Input instruction: 00000000000000000110000000110011
+# OR instruction PASSED!
+# 
+# Testing XOR instruction:
+# Input instruction: 00000000000000000100000000110011
+# XOR instruction PASSED!
+# 
+# Testing SLL instruction:
+# Input instruction: 00000000000000000001000000110011
+# SLL instruction PASSED!
+# 
+# Testing SRL instruction:
+# Input instruction: 00000000000000000101000000110011
+# SRL instruction PASSED!
+# 
+# Testing SRA instruction:
+# Input instruction: 01000000000000000101000000110011
+# SRA instruction PASSED!
+# 
+# Testing SLT instruction:
+# Input instruction: 00000000000000000010000000110011
+# SLT instruction PASSED!
+# 
+# Testing SLTU instruction:
+# Input instruction: 00000000000000000011000000110011
+# SLTU instruction PASSED!
+# 
+# ==== 2. Testing I-type Instructions (13) ====
+# 
+# Testing ADDI instruction:
+# Input instruction: 00000000000000000000000000010011
+# ADDI instruction PASSED!
+# 
+# Testing ANDI instruction:
+# Input instruction: 00000000000000000111000000010011
+# ANDI instruction PASSED!
+# 
+# Testing ORI instruction:
+# Input instruction: 00000000000000000110000000010011
+# ORI instruction PASSED!
+# 
+# Testing XORI instruction:
+# Input instruction: 00000000000000000100000000010011
+# XORI instruction PASSED!
+# 
+# Testing SLLI instruction:
+# Input instruction: 00000000000000000001000000010011
+# SLLI instruction PASSED!
+# 
+# Testing SRLI instruction:
+# Input instruction: 00000000000000000101000000010011
+# SRLI instruction PASSED!
+# 
+# Testing SRAI instruction:
+# Input instruction: 01000000000000000101000000010011
+# SRAI instruction PASSED!
+# 
+# Testing SLTI instruction:
+# Input instruction: 00000000000000000010000000010011
+# SLTI instruction PASSED!
+# 
+# Testing SLTIU instruction:
+# Input instruction: 00000000000000000011000000010011
+# SLTIU instruction PASSED!
+# 
+# Testing LB instruction:
+# Input instruction: 00000000000000000000000000000011
+# LB instruction PASSED!
+# 
+# Testing LH instruction:
+# Input instruction: 00000000000000000001000000000011
+# LH instruction PASSED!
+# 
+# Testing LW instruction:
+# Input instruction: 00000000000000000010000000000011
+# LW instruction PASSED!
+# 
+# Testing LBU instruction:
+# Input instruction: 00000000000000000100000000000011
+# LBU instruction PASSED!
+# 
+# Testing LHU instruction:
+# Input instruction: 00000000000000000101000000000011
+# LHU instruction PASSED!
+# 
+# ==== 3. Testing S-type Instructions (3) ====
+# 
+# Testing SB instruction:
+# Input instruction: 00000000000000000000000000100011
+# SB instruction PASSED!
+# 
+# Testing SH instruction:
+# Input instruction: 00000000000000000001000000100011
+# SH instruction PASSED!
+# 
+# Testing SW instruction:
+# Input instruction: 00000000000000000010000000100011
+# SW instruction PASSED!
+# 
+# ==== 4. Testing B-type Instructions (6) ====
+# 
+# Testing BEQ instruction:
+# Input instruction: 00000000000000000000000001100011
+# BEQ instruction PASSED!
+# 
+# Testing BNE instruction:
+# Input instruction: 00000000000000000001000001100011
+# BNE instruction PASSED!
+# 
+# Testing BLT instruction:
+# Input instruction: 00000000000000000100000001100011
+# BLT instruction PASSED!
+# 
+# Testing BGE instruction:
+# Input instruction: 00000000000000000101000001100011
+# BGE instruction PASSED!
+# 
+# Testing BLTU instruction:
+# Input instruction: 00000000000000000110000001100011
+# BLTU instruction PASSED!
+# 
+# Testing BGEU instruction:
+# Input instruction: 00000000000000000111000001100011
+# BGEU instruction PASSED!
+# 
+# ==== 5. Testing U/J-type Instructions (3) ====
+# 
+# Testing LUI instruction:
+# Input instruction: 00000000000000000000000000110111
+# ERROR: Output mismatch!
+# Expected: pc_sel=0, rd_wren=1, br_un=0, opa_sel=0, opb_sel=0
+#          mem_wren=0, insn_vld=0, alu_op=0000, wb_sel=11
+# Got:      pc_sel=0, rd_wren=1, br_un=0, opa_sel=0, opb_sel=1
+#          mem_wren=0, insn_vld=0, alu_op=0000, wb_sel=11
+# 
+# Testing AUIPC instruction:
+# Input instruction: 00000000000000000000000000010111
+# AUIPC instruction PASSED!
+# 
+# Testing JAL instruction:
+# Input instruction: 00000000000000000000000001101111
+# JAL instruction PASSED!
+# 
+# Testing JALR instruction:
+# Input instruction: 00000000000000000000000001100111
+# JALR instruction PASSED!
+# 
+# ==== 6. Testing Invalid Instruction ====
+# 
+# Testing INVALID instruction:
+# Input instruction: 00000000000000000000000001111111
+# INVALID instruction PASSED!
+# 
+# ======================================
+#   ALL 37 INSTRUCTIONS TESTED SUCCESSFULLY
+# ======================================
+# ** Note: $finish    : E:/BKHCM/HK 242/CTMT/code/controlunit/controlunit_tb.sv(237)
+#    Time: 400 ns  Iteration: 0  Instance: /controlunit_tb
+# 1
+# Break in Module controlunit_tb at E:/BKHCM/HK 242/CTMT/code/controlunit/controlunit_tb.sv line 237

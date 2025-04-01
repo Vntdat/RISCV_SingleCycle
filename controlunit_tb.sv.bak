@@ -1,0 +1,150 @@
+`timescale 1ns/1ps
+
+module controlunit_tb;
+
+    // Khai báo các tín hiệu
+    logic [31:0] i_instr;
+    logic br_less, br_equal;
+    
+    // Tín hiệu đầu ra
+    logic pc_sel, rd_wren, br_un, opa_sel, opb_sel, mem_wren;
+    logic [31:0] insn_vld;
+    logic [3:0] alu_op;
+    logic [1:0] wb_sel;
+    
+    // Khởi tạo Unit Under Test (UUT)
+    controlunit uut (
+        .i_instr(i_instr),
+        .br_less(br_less),
+        .br_equal(br_equal),
+        .pc_sel(pc_sel),
+        .rd_wren(rd_wren),
+        .br_un(br_un),
+        .opa_sel(opa_sel),
+        .opb_sel(opb_sel),
+        .mem_wren(mem_wren),
+        .insn_vld(insn_vld),
+        .alu_op(alu_op),
+        .wb_sel(wb_sel)
+    );
+    
+    // Tạo xung clock (không thực sự cần trong control unit combinational này)
+    logic clk = 0;
+    always #5 clk = ~clk;
+    
+    // Các task helper
+    task print_control_signals;
+        $display("Time = %0t: opcode=%5b funct3=%3b | pc_sel=%b rd_wren=%b br_un=%b opa_sel=%b opb_sel=%b mem_wren=%b alu_op=%4b wb_sel=%2b", 
+                 $time, i_instr[6:2], i_instr[14:12], 
+                 pc_sel, rd_wren, br_un, opa_sel, opb_sel, mem_wren, alu_op, wb_sel);
+    endtask
+    
+    task test_r_type;
+        input [2:0] funct3;
+        input funct7;
+        input [3:0] expected_alu_op;
+        begin
+            i_instr = {7'b0, 5'b0, 5'b0, funct3, 5'b0, 5'b01100}; // R-type opcode
+            i_instr[30] = funct7;
+            #10;
+            $display("Testing R-type: funct3=%3b funct7=%b", funct3, funct7);
+            print_control_signals();
+            if (alu_op !== expected_alu_op) $error("Wrong ALU opcode");
+        end
+    endtask
+    
+    task test_i_type;
+        input [2:0] funct3;
+        input [3:0] expected_alu_op;
+        begin
+            i_instr = {12'b0, 5'b0, funct3, 5'b0, 5'b00100}; // I-type opcode
+            #10;
+            $display("Testing I-type: funct3=%3b", funct3);
+            print_control_signals();
+            if (alu_op !== expected_alu_op) $error("Wrong ALU opcode");
+        end
+    endtask
+    
+    task test_branch;
+        input [2:0] funct3;
+        input expected_br_un;
+        begin
+            i_instr = {7'b0, 5'b0, 5'b0, funct3, 5'b0, 5'b11000}; // B-type opcode
+            #10;
+            $display("Testing Branch: funct3=%3b", funct3);
+            print_control_signals();
+            if (br_un !== expected_br_un) $error("Wrong br_un value");
+        end
+    endtask
+    
+    // Quá trình test
+    initial begin
+        $dumpfile("controlunit.vcd");
+        $dumpvars(0, controlunit_tb);
+        
+        $display("Starting Control Unit Testbench");
+        
+        // Test các lệnh R-type
+        test_r_type(3'b000, 1'b0, 4'b0000); // ADD
+        test_r_type(3'b000, 1'b1, 4'b0001); // SUB
+        test_r_type(3'b001, 1'b0, 4'b0111); // SLL
+        test_r_type(3'b010, 1'b0, 4'b0010); // SLT
+        test_r_type(3'b011, 1'b0, 4'b0011); // SLTU
+        test_r_type(3'b100, 1'b0, 4'b0100); // XOR
+        test_r_type(3'b101, 1'b0, 4'b1000); // SRL
+        test_r_type(3'b101, 1'b1, 4'b1001); // SRA
+        test_r_type(3'b110, 1'b0, 4'b0101); // OR
+        test_r_type(3'b111, 1'b0, 4'b0110); // AND
+        
+        // Test các lệnh I-type
+        test_i_type(3'b000, 4'b0000); // ADDI
+        test_i_type(3'b001, 4'b0111); // SLLI
+        test_i_type(3'b010, 4'b0010); // SLTI
+        test_i_type(3'b011, 4'b0011); // SLTIU
+        test_i_type(3'b100, 4'b0100); // XORI
+        test_i_type(3'b101, 4'b1000); // SRLI (fun7=0)
+        test_i_type(3'b110, 4'b0101); // ORI
+        test_i_type(3'b111, 4'b0110); // ANDI
+        
+        // Test các lệnh nhánh
+        br_equal = 1; br_less = 0;
+        test_branch(3'b000, 1'b0); // BEQ
+        test_branch(3'b001, 1'b0); // BNE
+        test_branch(3'b100, 1'b0); // BLT
+        test_branch(3'b101, 1'b0); // BGE
+        test_branch(3'b110, 1'b1); // BLTU
+        test_branch(3'b111, 1'b1); // BGEU
+        
+        // Test lệnh Store
+        $display("Testing Store instruction");
+        i_instr = {7'b0, 5'b0, 5'b0, 3'b010, 5'b0, 5'b01000}; // S-type opcode
+        #10;
+        print_control_signals();
+        if (mem_wren !== 1'b1) $error("Store should set mem_wren=1");
+        
+        // Test lệnh Load
+        $display("Testing Load instruction");
+        i_instr = {12'b0, 5'b0, 3'b010, 5'b0, 5'b00000}; // I-type load opcode
+        #10;
+        print_control_signals();
+        if (rd_wren !== 1'b1 || wb_sel !== 2'b10) $error("Load error");
+        
+        // Test lệnh JAL
+        $display("Testing JAL instruction");
+        i_instr = {20'b0, 5'b0, 5'b11011}; // JAL opcode
+        #10;
+        print_control_signals();
+        if (pc_sel !== 1'b1 || rd_wren !== 1'b1) $error("JAL error");
+        
+        // Test lệnh LUI
+        $display("Testing LUI instruction");
+        i_instr = {20'b0, 5'b0, 5'b01101}; // LUI opcode
+        #10;
+        print_control_signals();
+        if (wb_sel !== 2'b11) $error("LUI should select immediate");
+        
+        $display("All tests completed");
+        $finish;
+    end
+
+endmodule
