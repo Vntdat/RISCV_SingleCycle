@@ -2,7 +2,7 @@ module sub_32 (
 	input logic [31:0] a,
 	input logic [31:0] b,
 	output logic [31:0] s,
-	output logic c_out
+	output logic cout
 	);
 	
 	logic [31:0] b_inv;
@@ -44,5 +44,5 @@ module sub_32 (
     full_adder fa30 (.a(a[30]), .b(b_inv[30]), .cin(carry[30]), .sum(s[30]), .cout(carry[31]));
     full_adder fa31 (.a(a[31]), .b(b_inv[31]), .cin(carry[31]), .sum(s[31]), .cout(carry[32]));
 
-    assign c_out = carry[32];
+    assign cout = carry[32];
 endmodule
