@@ -8,8 +8,9 @@ module sub_32 (
 	logic [31:0] b_inv;
 	logic [32:0] carry;
 	
-	assign b_inv = !b;
-	assign carry[0] = 1;
+    assign b_inv = ~b;  // Lấy bù một của b
+    assign carry[0] = 1; // Cộng thêm 1 vào b_inv để lấy bù hai
+
 	
 	full_adder fa0  (.a(a[0]),  .b(b_inv[0]),  .cin(carry[0]),  .sum(s[0]),  .cout(carry[1]));
     full_adder fa1  (.a(a[1]),  .b(b_inv[1]),  .cin(carry[1]),  .sum(s[1]),  .cout(carry[2]));
