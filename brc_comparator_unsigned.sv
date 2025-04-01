@@ -11,7 +11,7 @@ module brc_comparator_unsigned(
         .a(a),
         .b(b),
         .s(sub_result),
-        .c_out(borrow) // borrow = 0 nếu A < B
+        .cout(borrow) // borrow = 0 nếu A < B
     );
 
     // So sánh kết quả
