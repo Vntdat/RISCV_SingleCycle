@@ -12,7 +12,7 @@ module memory (
 
     // Đọc file dữ liệu/mã lệnh
     initial begin
-		$readmemh("memory_init.mem.txt", mem);
+		$readmemh("memory_init.dump", mem);
     end
 
     // Đọc không đồng bộ
