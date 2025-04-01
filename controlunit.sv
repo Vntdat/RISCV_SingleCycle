@@ -5,7 +5,7 @@ module controlunit (
 		
 		//tin hieu ngo ra
 		output logic pc_sel, rd_wren, br_un, opa_sel, opb_sel, mem_wren,
-		output logic [31:0] insn_vld, 
+		output logic insn_vld, 
 		output logic [3:0] alu_op,
 		output logic [1:0] wb_sel
 );
@@ -26,10 +26,10 @@ module controlunit (
 				br_un     = 1'b0;    // so sanh co dau
 				rd_wren   = 1'b0;    // read
 				opa_sel   = 1'b0;    // alu nhan rs1
-				opb_sel   = 1'b0;    // alu nhan imm
+				opb_sel   = 1'b1;    // alu imm
 				mem_wren  = 1'b0;    // read alu (load)
 				alu_op    = 4'b0000; // add
-				wb_sel    = 2'b00;   // pc +4
+				wb_sel    = 2'b00;   // alu_data
 				insn_vld  = 1'b1;    // len hop le
 				
 		// dua tren opcode de phan biec cac loai lenh R, I, S, B, U, J
@@ -40,8 +40,8 @@ module controlunit (
 					pc_sel  = 1'b0;
 					rd_wren = 1'b1;
 					opa_sel = 1'b0;
-					opb_sel = 1'b1;
-					wb_sel  = 2'b01;
+					opb_sel = 1'b0; //rs2
+					wb_sel  = 2'b00; //alu_data
 					insn_vld  = 1'b0;
 								case  (fun3)
 										3'b000: begin
@@ -69,8 +69,8 @@ module controlunit (
 					pc_sel  = 1'b0;
 					rd_wren = 1'b1;
 					opa_sel = 1'b0;
-					opb_sel = 1'b1;
-					wb_sel  = 2'b01;
+					opb_sel = 1'b1; //imm
+					wb_sel  = 2'b00; //alu_data
 					insn_vld  = 1'b0;
 									case (fun3)
 											3'b000: alu_op = 4'b0000; // lenh ADDI
@@ -91,7 +91,7 @@ module controlunit (
 				//B-Format len re nhanh
 				5'b11000: begin
 								opa_sel  = 1'b1;
-								opb_sel  = 1'b0;
+								opb_sel  = 1'b1; //imm
 								rd_wren  = 1'b0;
 								mem_wren = 1'b0;
 								insn_vld  = 1'b0;
@@ -127,9 +127,9 @@ module controlunit (
 					pc_sel   = 1'b0;
 					rd_wren  = 1'b0;
 					opa_sel  = 1'b0;
-					opb_sel  = 1'b1;
+					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b1;
-					wb_sel   = 2'b10;
+					wb_sel   = 2'b01; //lsu
 					insn_vld  = 1'b0;
 							 end
 				// I_Format lenh Load doc du leu tu LSU
@@ -137,9 +137,9 @@ module controlunit (
 					pc_sel   = 1'b0;
 					rd_wren  = 1'b1;
 					opa_sel  = 1'b0;
-					opb_sel  = 1'b0;
+					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
-					wb_sel   = 2'b10;	
+					wb_sel   = 2'b01; //lsu	
 					insn_vld  = 1'b0;
 							 end			
 				//U_Format lenh nhay khong dieu kien
@@ -147,18 +147,18 @@ module controlunit (
 					pc_sel   = 1'b1;
 					rd_wren  = 1'b1;
 					opa_sel  = 1'b1;
-					opb_sel  = 1'b0;
+					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
-					wb_sel   = 2'b00;
+					wb_sel   = 2'b10; //pc+4
 					insn_vld  = 1'b0;
 							 end
 				5'b11001: begin 	//lenh JALR
 					pc_sel   = 1'b1;
 					rd_wren  = 1'b1;
 					opa_sel  = 1'b0;
-					opb_sel  = 1'b0;
+					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
-					wb_sel   = 2'b00;
+					wb_sel   = 2'b10; //pc+4
 					insn_vld  = 1'b0;
 							end
 				//I_Format 
@@ -175,9 +175,9 @@ module controlunit (
 					pc_sel   = 1'b0;
 					rd_wren  = 1'b1;
 					opa_sel  = 1'b1;
-					opb_sel  = 1'b0;
+					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
-					wb_sel   = 2'b00;
+					wb_sel   = 2'b10; //pc+4
 					insn_vld  = 1'b0;
 						end
 			endcase
