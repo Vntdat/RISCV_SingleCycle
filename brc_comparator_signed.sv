@@ -6,7 +6,7 @@ module brc_comparator_signed(
 );
 
 	logic [31:0] sub_result;
-	logic c_out;
+	logic cout;
 	logic a_sign, b_sign;
 
 	// Lấy bit dấu của hai số
@@ -18,12 +18,12 @@ module brc_comparator_signed(
 		.a(a),
 		.b(b),
 		.s(sub_result),
-		.c_out(c_out)
+		.cout(cout)
 	);
 	
 	// Kiểm tra các điều kiện
 	assign A_eq_B = (sub_result == 0);
 	assign A_lt_B = (a_sign & ~b_sign) |  // Nếu a âm và b dương thì a < b
-                    (~(a_sign ^ b_sign) & ~c_out);  // Nếu cùng dấu và c_out = 0 thì a < b
+                    (~(a_sign ^ b_sign) & ~cout);  // Nếu cùng dấu và c_out = 0 thì a < b
 
 endmodule
