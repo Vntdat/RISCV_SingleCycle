@@ -132,10 +132,15 @@ module singlecycle (
 		.wb_sel 		(wb_sel)
 	);
 	
-	imem imem (
-		.i_addr (pc),
-		.o_data (instr)
-	);
+	memory memory (
+		.i_clk    (i_clk),
+		.i_reset  (i_reset),
+		.i_addr   (pc),       // Địa chỉ đọc lệnh
+		.i_wdata  (rs2_data), // Dữ liệu cần ghi
+		.i_bmask  (mem_bmask),
+		.i_wren   (mem_wren), // Ghi khi cần
+		.o_rdata  (mem_rdata) // Lệnh đọc ra từ bộ nhớ
+);
 	
 	pc_reg pc_reg (
 		.i_clk (i_clk),
