@@ -4,5 +4,5 @@ module mux2_1_32bit (
 	input  logic        s,
 	output logic [31:0] y 
 );
-	assign y = a&~s | b&s;
+	assign y = s ? b : a; 
 endmodule
