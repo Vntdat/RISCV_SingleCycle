@@ -6,5 +6,5 @@ module mux2_1 (
 	);
 
 	assign y = (~s&a) | (s&b);
-	
+
 endmodule
