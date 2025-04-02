@@ -82,14 +82,14 @@ module singlecycle (
 		.o_alu_data (alu_data)
 	);
 	
-	mux2_1 opa (
+	mux2_1_32bit opa (
 		.a (rs1_data),
 		.b (pc),
 		.s (opa_sel),
 		.y (operand_a)
 	);
 	
-	mux2_1 opb (
+	mux2_1_32bit opb (
 		.a (rs2_data),
 		.b (immediate),
 		.s (opb_sel),
@@ -132,15 +132,11 @@ module singlecycle (
 		.wb_sel 		(wb_sel)
 	);
 	
-	memory memory (
-		.i_clk    (i_clk),
-		.i_reset  (i_reset),
-		.i_addr   (pc),       // Địa chỉ đọc lệnh
-		.i_wdata  (rs2_data), // Dữ liệu cần ghi
-		.i_bmask  (mem_bmask),
-		.i_wren   (mem_wren), // Ghi khi cần
-		.o_rdata  (mem_rdata) // Lệnh đọc ra từ bộ nhớ
-);
+	imem imem (
+		.i_addr (pc),
+		.o_data (instr)
+	);
+	
 	pc_reg pc_reg (
 		.i_clk (i_clk),
 		.i_reset (i_reset),
