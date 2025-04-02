@@ -82,14 +82,14 @@ module singlecycle (
 		.o_alu_data (alu_data)
 	);
 	
-	mux2_1 opa (
+	mux2_1_32bit opa (
 		.a (rs1_data),
 		.b (pc),
 		.s (opa_sel),
 		.y (operand_a)
 	);
 	
-	mux2_1 opb (
+	mux2_1_32bit opb (
 		.a (rs2_data),
 		.b (immediate),
 		.s (opb_sel),
