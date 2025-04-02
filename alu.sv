@@ -8,8 +8,8 @@ module alu (
 	logic cout;
 	logic [31:0] o_add;
 	logic [31:0] o_sub;
-	logic [31:0] o_slt;
-	logic [31:0] o_sltu;
+	logic  o_slt;
+	logic  o_sltu;
 	logic [31:0] o_xor;
 	logic [31:0] o_or;
 	logic [31:0] o_and;
