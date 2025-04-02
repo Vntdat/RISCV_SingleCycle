@@ -12,11 +12,7 @@ module memory (
 
     // Đọc file dữ liệu/mã lệnh
     initial begin
-<<<<<<< Updated upstream
-        $readmemh("memory_init.mem", mem);
-=======
-		$readmemh("app1.dump", mem);
->>>>>>> Stashed changes
+		$readmemh("memory_init.dump", mem);
     end
 
     // Đọc không đồng bộ
