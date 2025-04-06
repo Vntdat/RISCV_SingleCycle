@@ -3,7 +3,7 @@ module mux4_1_32bit (
 	input logic [31:0] b,
 	input logic [31:0] c,
 	input logic [31:0] d,
-	input logic [2:0] s,
+	input logic [1:0] s,
 	output logic [31:0] y
 );
 
