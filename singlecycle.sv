@@ -132,7 +132,7 @@ module singlecycle (
 		.wb_sel 		(wb_sel)
 	);
 	
-	memory memory (
+	memory mem (
 		.i_clk    (i_clk),
 		.i_reset  (i_reset),
 		.i_addr   (pc),       // Địa chỉ đọc lệnh
@@ -140,8 +140,13 @@ module singlecycle (
 		.i_bmask  (mem_bmask),
 		.i_wren   (mem_wren), // Ghi khi cần
 		.o_rdata  (mem_rdata) // Lệnh đọc ra từ bộ nhớ
-);
-	
+	);
+
+/*	imem imem (
+		.imem_addr(pc),
+		.imem_data(instr)
+	);
+*/	
 	pc_reg pc_reg (
 		.i_clk (i_clk),
 		.i_reset (i_reset),
@@ -154,7 +159,7 @@ module singlecycle (
 		.b (alu_data),   // Giá trị từ ALU (nhảy hoặc branch)
 		.s (pc_sel),     // Tín hiệu chọn (1: chọn ALU, 0: chọn PC + 4)
 		.y (pc_next)     // Kết quả đầu ra
-);
+	);
 
 	fulladder_32 pc_adder (
 		.a 	(pc),
@@ -162,22 +167,13 @@ module singlecycle (
 		.sum 	(pc_four)
 	);
 
-	
-endmodule: singlecycle
-
-module pc_reg (
-	input logic i_clk,
-	input logic i_reset,
-	input logic [31:0] i_pc_next,
-	output logic [31:0] o_pc
+	mux4_1_32bit wb (
+		.a (pc_four),
+		.b (alu_data),
+		.c (ld_data),
+		.d (immediate),
+		.s (wb_sel),
+		.y (wb_data)
 	);
-	
-	// Thanh ghi lưu trữ giá trị PC
-	always_ff @(posedge i_clk or negedge i_reset) begin
-		if (!i_reset) 
-				o_pc <= 32'h0; // Reset về 0 khi có tín hiệu reset
-		else 
-				o_pc <= i_pc_next; // Cập nhật PC với giá trị tiếp theo
-	end
 
-endmodule: pc_reg
+endmodule
