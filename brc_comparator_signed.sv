@@ -23,7 +23,6 @@ module brc_comparator_signed(
 	
 	// Kiểm tra các điều kiện
 	assign A_eq_B = (sub_result == 0);
-	assign A_lt_B = (a_sign & ~b_sign) |  // Nếu a âm và b dương thì a < b
-                    (~(a_sign ^ b_sign) & ~cout);  // Nếu cùng dấu và c_out = 0 thì a < b
+	assign A_lt_B = (a_sign & ~b_sign) | (~(a_sign ^ b_sign) & ~cout);
 
 endmodule

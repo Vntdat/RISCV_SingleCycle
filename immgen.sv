@@ -19,7 +19,7 @@ module immgen (
 
             // Store-Type: Các lệnh lưu dữ liệu (SW, SH, SB)
             7'b0100011: begin
-                o_imm = {{21{i_inst[31]}}, i_inst[31:25], i_inst[11:7]};
+                o_imm = {{20{i_inst[31]}}, i_inst[31:25], i_inst[11:7]};
             end
 
             // Branch-Type: Các lệnh rẽ nhánh (BEQ, BNE, BLT, BGE, BLTU, BGEU)

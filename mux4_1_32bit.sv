@@ -10,5 +10,5 @@ module mux4_1_32bit (
 	assign y = (s == 2'b00) ? a :
               (s == 2'b01) ? b :
               (s == 2'b10) ? c :
-										d;
+			d;
 endmodule
