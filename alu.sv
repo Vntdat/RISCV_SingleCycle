@@ -81,6 +81,7 @@ module alu (
 
 	mux16_1 MUX (.in(mux_inputs),
 						.sel(i_alu_op),
-						.out(o_alu_data)); //
+						.out(o_alu_data));
+///okechuwa
 						
 endmodule
