@@ -7,21 +7,24 @@ module dmem (
 	output logic [31:0] o_ld_data
 );
 	
-	logic [31:0] data_memory [0:8191]; 
+	logic [31:0] data_memory [0:63]; 
 	integer i;
 	
+	initial begin
+	$readmemh("D:/HCMUT/HK242/CTMT/test/isa.mem", data_memory);
+	end
 	
 	always_ff@(posedge i_clk) begin
 		if (i_reset) begin
-			for (i = 0; i < 32; i = i + 1) begin
+			for (i = 0; i < 63; i = i + 1) begin
 				 data_memory[i] <= 32'b0;
 			end
 
 		end else begin
 			if (i_lsu_wren) begin
-				data_memory[i_lsu_addr[14:2]] = i_st_data;
+				data_memory[i_lsu_addr[7:2]] = i_st_data;
 			end else begin
-				o_ld_data = data_memory[i_lsu_addr[14:2]];
+				o_ld_data = data_memory[i_lsu_addr[7:2]];
 			end
 		end
 	end
