@@ -8,21 +8,21 @@ module memory (
     output logic [31:0] o_rdata
 );
 
-    parameter MEM_SIZE = 32;
+    parameter MEM_SIZE = 4096;
     logic [31:0] mem [MEM_SIZE-1:0];
 
     // Đọc file dữ liệu/mã lệnh
     initial begin
-        $readmemh("D:/HCMUT/HK242/CTMT/singlecycle/isa.mem", mem);
+        $readmemh("/home/cpa/ca111/sc-test/02_test/isa.mem", mem);
     end
 
     // Đọc không đồng bộ
-    assign o_rdata = mem[i_addr[6:2]];  // Căn chỉnh theo từ (word-aligned)
+    assign o_rdata = mem[i_addr[13:2]];  // Căn chỉnh theo từ (word-aligned)
 
     // Ghi đồng bộ với byte mask
     always_ff @(posedge i_clk or posedge i_reset) begin
         if (i_reset) begin
-            for (int i = 0; i < 32; i = i + 1)
+            for (int i = 0; i < 1024; i = i + 1)
                 mem[i] <= 32'b0;
         end else if (i_wren) begin
             if (i_bmask[0]) mem[i_addr[13:2]][7:0]   <= i_wdata[7:0];

@@ -24,7 +24,7 @@ module controlunit (
         opa_sel   = 1'b0;    // ALU lấy rs1
         opb_sel   = 1'b1;    // ALU lấy imm
         mem_wren  = 1'b0;    // đọc từ ALU (load)
-        alu_op    = 4'b1111; 
+        alu_op    = 4'b0000; // ADD
         wb_sel    = 2'b00;   // ALU data
 
         case (opcode)

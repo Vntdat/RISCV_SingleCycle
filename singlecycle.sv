@@ -100,26 +100,38 @@ module singlecycle (
     );
 
     // LSU (Load/Store Unit)
-	lsu lsu (
-		.i_clk 			(i_clk),         // Xung clock
-		.i_reset 		(i_reset),       // Tín hiệu reset (active low)
-		.i_lsu_addr		(alu_data),    						// Địa chỉ bộ nhớ
-		.i_st_data		(rs2_data),     						// Dữ liệu cần ghi
-		.i_lsu_wren    (mem_wren),			// Tín hiệu cho phép ghi (1: ghi, 0: đọc)
-		.o_ld_data		(ld_data),     // Dữ liệu đọc từ bộ nhớ
-		.o_io_ledr (o_io_ledr),    // Điều khiển đèn LED đỏ
-		.o_io_ledg (o_io_ledg),    // Điều khiển đèn LED xanh lá
-		.o_io_hex0 (o_io_hex0),
-		.o_io_hex1 (o_io_hex1),
-		.o_io_hex2 (o_io_hex2),
-		.o_io_hex3 (o_io_hex3),
-		.o_io_hex4 (o_io_hex4),
-		.o_io_hex5 (o_io_hex5),
-		.o_io_hex6 (o_io_hex6),
-		.o_io_hex7 (o_io_hex7),
-		.o_io_lcd  (o_io_lcd),
-		.i_io_sw   (i_io_sw)
-	);
+/*    lsu lsu (
+        .i_clk         (i_clk),
+        .i_reset       (i_reset),
+        .i_lsu_addr    (alu_data),
+        .i_st_data     (rs2_data),
+        .i_lsu_wren    (mem_wren),
+        .o_ld_data     (ld_data),
+        .o_io_ledr     (o_io_ledr),
+        .o_io_ledg     (o_io_ledg),
+        .o_io_hex0     (o_io_hex0),
+        .o_io_hex1     (o_io_hex1),
+        .o_io_hex2     (o_io_hex2),
+        .o_io_hex3     (o_io_hex3),
+        .o_io_hex4     (o_io_hex4),
+        .o_io_hex5     (o_io_hex5),
+        .o_io_hex6     (o_io_hex6),
+        .o_io_hex7     (o_io_hex7),
+        .o_io_lcd      (o_io_lcd),
+        .i_io_sw       (i_io_sw)
+    );
+*/
+
+	dmem data_mem (
+		.i_clk 		(i_clk),         // Xung clock
+		.i_reset 	(i_reset),       // Tín hiệu reset (active low)
+		.i_lsu_addr 	(alu_data),    // Địa chỉ bộ nhớ
+		.i_st_data 	(rs2_data),     // Dữ liệu cần ghi
+		.i_lsu_wren 	(mem_wren),    // Tín hiệu cho phép ghi
+		.o_ld_data	(ld_data)
+);
+
+
     // Control unit
     controlunit controlunit (
         .i_instr    (instr),
