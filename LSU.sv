@@ -1,125 +1,82 @@
 module lsu (
-    input  logic        i_clk,         // Xung clock
-    input  logic        i_reset,       // Tín hiệu reset (active low)
-    input  logic [31:0] i_lsu_addr,    // Địa chỉ bộ nhớ
-    input  logic [31:0] i_st_data,     // Dữ liệu cần ghi
-    input  logic        i_lsu_wren,    // Tín hiệu cho phép ghi
-    output logic [31:0] o_ld_data,     // Dữ liệu đọc từ bộ nhớ
-    output logic [31:0] o_io_ledr,     // LED đỏ
-    output logic [31:0] o_io_ledg,     // LED xanh lá
-    output logic [6:0]  o_io_hex0,     // HEX0
-    output logic [6:0]  o_io_hex1,     // HEX1
-    output logic [6:0]  o_io_hex2,     // HEX2
-    output logic [6:0]  o_io_hex3,     // HEX3
-    output logic [6:0]  o_io_hex4,     // HEX4
-    output logic [6:0]  o_io_hex5,     // HEX5
-    output logic [6:0]  o_io_hex6,     // HEX6
-    output logic [6:0]  o_io_hex7,     // HEX7
-    output logic [31:0] o_io_lcd,      // LCD
-    input  logic [31:0] i_io_sw        // Dữ liệu từ công tắc
+    input  logic        i_clk,
+    input  logic        i_reset,
+    input  logic [31:0] i_lsu_addr,
+    input  logic [31:0] i_st_data,
+    input  logic        i_lsu_wren,
+
+    output logic [31:0] o_ld_data,
+    output logic [31:0] o_io_ledr,
+    output logic [31:0] o_io_ledg,
+    output logic [6:0]  o_io_hex0,
+    output logic [6:0]  o_io_hex1,
+    output logic [6:0]  o_io_hex2,
+    output logic [6:0]  o_io_hex3,
+    output logic [6:0]  o_io_hex4,
+    output logic [6:0]  o_io_hex5,
+    output logic [6:0]  o_io_hex6,
+    output logic [6:0]  o_io_hex7,
+    output logic [31:0] o_io_lcd,
+
+    input  logic [31:0] i_io_sw
 );
 
-    logic data;
-    logic io;
-    logic sw;    
+    logic [31:0] mem [0:511];
 
-    // Bộ nhớ dữ liệu (8 Ki words = 32 KiB)
-    logic [31:0] data_memory [0:8191]; 
-    logic [31:0] io_memory [0:15];
-    logic [31:0] sw_memory [0:3];
-
-    // Khởi tạo bộ nhớ trong khối reset
-    initial begin
-        io_memory = '{default: 32'h0};
-        sw_memory = '{default: 32'h0};
-    end
-
-    assign data = (i_lsu_addr < 32'h0000_8000);  // Địa chỉ từ 0x0000_0000 đến 0x0000_7FFF
-    assign io   = (i_lsu_addr >= 32'h1000_0000 && i_lsu_addr <= 32'h1000_4FFF);
-    assign sw   = (i_lsu_addr >= 32'h1001_0000 && i_lsu_addr <= 32'h1001_0FFF);
-
-    logic [2:0] lsu_op;
-    assign lsu_op = i_lsu_addr[18:16]; 
+    logic mem_sel, sw_sel, ledr_sel, ledg_sel, hex_lo_sel, hex_hi_sel, lcd_sel;
 
     always_comb begin
-        logic [31:0] mem_data;
-        mem_data = 32'h0;
-        o_ld_data = 32'h0;
-
-        if (!i_lsu_wren) begin
-            if (data) begin
-                mem_data = data_memory[i_lsu_addr[14:2]];
-            end 
-            else if (io) begin
-                mem_data = io_memory[i_lsu_addr[5:2]];
-            end 
-            else if (sw) begin
-                mem_data = sw_memory[i_lsu_addr[3:2]];
-            end 
-            else begin
-                mem_data = 32'h0;
-            end
-
-            o_ld_data = mem_data;
-        end 
+        mem_sel     = (i_lsu_addr >= 32'h0000_0000) && (i_lsu_addr <= 32'h0000_07FF);
+        ledr_sel    = (i_lsu_addr >= 32'h1000_0000) && (i_lsu_addr <= 32'h1000_0FFF);
+        ledg_sel    = (i_lsu_addr >= 32'h1000_1000) && (i_lsu_addr <= 32'h1000_1FFF);
+        hex_lo_sel  = (i_lsu_addr >= 32'h1000_2000) && (i_lsu_addr <= 32'h1000_2FFF);
+        hex_hi_sel  = (i_lsu_addr >= 32'h1000_3000) && (i_lsu_addr <= 32'h1000_3FFF);
+        lcd_sel     = (i_lsu_addr >= 32'h1000_4000) && (i_lsu_addr <= 32'h1000_4FFF);
+        sw_sel      = (i_lsu_addr >= 32'h1001_0000) && (i_lsu_addr <= 32'h1001_0FFF);
     end
-
-    always_ff @(posedge i_clk or negedge i_reset) begin
-        if (!i_reset) begin
-            io_memory <= '{default:32'h0};
-            sw_memory <= '{default:32'h0};
-        end
-        else if (i_lsu_wren) begin
-            case (lsu_op)
-                3'b000: begin // SB
-                    if (data) begin
-                        data_memory[i_lsu_addr[14:2]][7:0] <= i_st_data[7:0];
-                    end
-                    else if (io) begin
-                        io_memory[i_lsu_addr[5:2]][7:0] <= i_st_data[7:0];
-                    end
-                    else if (sw) begin
-                        sw_memory[i_lsu_addr[3:2]][7:0] <= i_io_sw[7:0];
-                    end
-                end
-                3'b001: begin // SH
-                    if (data) begin
-                        data_memory[i_lsu_addr[14:2]][15:0] <= i_st_data[15:0];
-                    end
-                    else if (io) begin
-                        io_memory[i_lsu_addr[5:2]][15:0] <= i_st_data[15:0];
-                    end
-                    else if (sw) begin
-                        sw_memory[i_lsu_addr[3:2]][15:0] <= i_io_sw[15:0];
-                    end
-                end
-                3'b010: begin // SW
-                    if (data) begin
-                        data_memory[i_lsu_addr[14:2]] <= i_st_data;
-                    end
-                    else if (io) begin
-                        io_memory[i_lsu_addr[5:2]] <= i_st_data;
-                    end
-                    else if (sw) begin
-                        sw_memory[i_lsu_addr[3:2]] <= i_io_sw;
-                    end
-                end
-                default: begin end
-            endcase
+// STORE
+    always_ff @(posedge i_clk) begin
+        if (i_reset) begin
+            o_io_ledr <= 32'd0;
+            o_io_ledg <= 32'd0;
+            o_io_lcd  <= 32'd0;
+            o_io_hex0 <= 7'd0;
+            o_io_hex1 <= 7'd0;
+            o_io_hex2 <= 7'd0;
+            o_io_hex3 <= 7'd0;
+            o_io_hex4 <= 7'd0;
+            o_io_hex5 <= 7'd0;
+            o_io_hex6 <= 7'd0;
+            o_io_hex7 <= 7'd0;
+        end else if (i_lsu_wren) begin
+            if (mem_sel)
+                mem[i_lsu_addr[10:2]] <= i_st_data;
+            else if (ledr_sel)
+                o_io_ledr <= i_st_data;
+            else if (ledg_sel)
+                o_io_ledg <= i_st_data;
+            else if (hex_lo_sel) begin
+                o_io_hex0 <= i_st_data[6:0];
+                o_io_hex1 <= i_st_data[14:8];
+                o_io_hex2 <= i_st_data[22:16];
+                o_io_hex3 <= i_st_data[30:24];
+            end else if (hex_hi_sel) begin
+                o_io_hex4 <= i_st_data[6:0];
+                o_io_hex5 <= i_st_data[14:8];
+                o_io_hex6 <= i_st_data[22:16];
+                o_io_hex7 <= i_st_data[30:24];
+            end else if (lcd_sel)
+                o_io_lcd <= i_st_data;
         end
     end
-
-    // Kết nối bộ nhớ ngoại vi với các thiết bị
-    assign o_io_ledr = io_memory[0];
-    assign o_io_ledg = io_memory[1];
-    assign o_io_hex0 = io_memory[2][6:0];
-    assign o_io_hex1 = io_memory[3][6:0];
-    assign o_io_hex2 = io_memory[4][6:0];
-    assign o_io_hex3 = io_memory[5][6:0];
-    assign o_io_hex4 = io_memory[6][6:0];
-    assign o_io_hex5 = io_memory[7][6:0];
-    assign o_io_hex6 = io_memory[8][6:0];
-    assign o_io_hex7 = io_memory[9][6:0];
-    assign o_io_lcd  = io_memory[10];
+ // LOAD
+    always_comb begin
+        if (mem_sel)
+            o_ld_data = mem[i_lsu_addr[10:2]];
+        else if (sw_sel)
+            o_ld_data = i_io_sw;
+        else
+            o_ld_data = 32'd0;
+    end
 
 endmodule
