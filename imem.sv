@@ -3,12 +3,12 @@ module imem (
 	output logic [31:0] imem_data
 	);
 	
-	logic [31:0] imem [0:8191];
+	logic [31:0] imem [0:63];
 	initial begin
-		$readmemh ("/home/cpa/ca111/sc-test/02_test/isa.mem", imem);
+		$readmemh ("D:/HCMUT/HK242/CTMT/test/isa.mem", imem);
 	end
 		
 	always_comb begin	
-		imem_data = imem[imem_addr[14:2]];
+		imem_data = imem[imem_addr[7:2]];
 	end
 endmodule
