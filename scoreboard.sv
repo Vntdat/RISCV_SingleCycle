@@ -24,7 +24,6 @@ module scoreboard(
     if (o_pc_debug == 32'h14) $write("%s", o_io_ledr[7:0]);
     if (o_pc_debug == 32'h1c) begin
       $display("\nEND of ISA test\n");
-      $finish;
     end
   end
 

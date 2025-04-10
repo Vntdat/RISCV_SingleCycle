@@ -100,7 +100,7 @@ module singlecycle (
     );
 
     // LSU (Load/Store Unit)
-/*    lsu lsu (
+    lsu lsu (
         .i_clk         (i_clk),
         .i_reset       (i_reset),
         .i_lsu_addr    (alu_data),
@@ -120,17 +120,17 @@ module singlecycle (
         .o_io_lcd      (o_io_lcd),
         .i_io_sw       (i_io_sw)
     );
+
+/*
+	dmem data_mem(
+		.i_clk         (i_clk),
+		.i_reset       (i_reset),
+		.i_lsu_addr    (alu_data),
+		.i_st_data     (rs2_data),
+		.i_lsu_wren    (mem_wren),
+		.o_ld_data     (ld_data)
+	);
 */
-
-	dmem data_mem (
-		.i_clk 		(i_clk),         // Xung clock
-		.i_reset 	(i_reset),       // Tín hiệu reset (active low)
-		.i_lsu_addr 	(alu_data),    // Địa chỉ bộ nhớ
-		.i_st_data 	(rs2_data),     // Dữ liệu cần ghi
-		.i_lsu_wren 	(mem_wren),    // Tín hiệu cho phép ghi
-		.o_ld_data	(ld_data)
-);
-
 
     // Control unit
     controlunit controlunit (
@@ -149,8 +149,8 @@ module singlecycle (
 
     // Memory unit (for fetching instructions)
 	imem instr_mem (
-	.imem_addr (pc),
-	.imem_data (instr)
+	.i_addr (pc),
+	.o_inst (instr)
 	);
 
     // Program counter (PC) register
@@ -178,9 +178,9 @@ module singlecycle (
 
     // Write-back multiplexer
     mux4_1_32bit wb (
-        .a (pc_four),
-        .b (alu_data),
-        .c (ld_data),
+	    .a (alu_data),
+	    .b (ld_data),
+	    .c (pc_four),
         .d (immediate),
         .s (wb_sel),
         .y (wb_data)

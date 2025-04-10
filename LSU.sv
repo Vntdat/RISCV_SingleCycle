@@ -50,7 +50,7 @@ module lsu (
             o_io_hex7 <= 7'd0;
         end else if (i_lsu_wren) begin
             if (mem_sel)
-                mem[i_lsu_addr[10:2]] <= i_st_data;
+                mem[i_lsu_addr[9:2]] <= i_st_data;
             else if (ledr_sel)
                 o_io_ledr <= i_st_data;
             else if (ledg_sel)
@@ -72,7 +72,7 @@ module lsu (
  // LOAD
     always_comb begin
         if (mem_sel)
-            o_ld_data = mem[i_lsu_addr[10:2]];
+            o_ld_data = mem[i_lsu_addr[9:2]];
         else if (sw_sel)
             o_ld_data = i_io_sw;
         else
