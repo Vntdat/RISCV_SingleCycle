@@ -1,82 +1,123 @@
 module lsu (
     input  logic        i_clk,
     input  logic        i_reset,
-    input  logic [31:0] i_lsu_addr,
-    input  logic [31:0] i_st_data,
-    input  logic        i_lsu_wren,
+    input  logic [31:0] i_addr,
+    input  logic [31:0] i_wdata,
+    input  logic [3:0]  i_bmask,
+    input  logic        i_wren,
+    output logic [31:0] o_rdata,
 
-    output logic [31:0] o_ld_data,
-    output logic [31:0] o_io_ledr,
-    output logic [31:0] o_io_ledg,
-    output logic [6:0]  o_io_hex0,
-    output logic [6:0]  o_io_hex1,
-    output logic [6:0]  o_io_hex2,
-    output logic [6:0]  o_io_hex3,
-    output logic [6:0]  o_io_hex4,
-    output logic [6:0]  o_io_hex5,
-    output logic [6:0]  o_io_hex6,
-    output logic [6:0]  o_io_hex7,
-    output logic [31:0] o_io_lcd,
-
-    input  logic [31:0] i_io_sw
+    // I/O Ports
+    output logic [31:0] o_io_ledr,    // Red LEDs
+    output logic [31:0] o_io_ledg,    // Green LEDs
+    output logic [6:0]  o_io_hex0,    // 7-seg 0
+    output logic [6:0]  o_io_hex1,    // 7-seg 1
+    output logic [6:0]  o_io_hex2,    // 7-seg 2
+    output logic [6:0]  o_io_hex3,    // 7-seg 3
+    output logic [6:0]  o_io_hex4,    // 7-seg 4
+    output logic [6:0]  o_io_hex5,    // 7-seg 5
+    output logic [6:0]  o_io_hex6,    // 7-seg 6
+    output logic [6:0]  o_io_hex7,    // 7-seg 7
+    output logic [31:0] o_io_lcd,     // LCD Control
+    input  logic [31:0] i_io_sw       // Switches
 );
 
-    logic [31:0] mem [0:511];
+    // Memory and I/O Registers
+    logic [31:0] data_memory [0:511];  // 2KB RAM (512 words)
+    logic [31:0] lcd_reg;              // LCD Control Register
+    logic [31:0] ledr_reg;             // Red LEDs
+    logic [31:0] ledg_reg;             // Green LEDs
+    logic [6:0]  hex_reg [0:7];        // 7-segment displays
 
-    logic mem_sel, sw_sel, ledr_sel, ledg_sel, hex_lo_sel, hex_hi_sel, lcd_sel;
+    // Address Decoding
+    logic is_ram_access;    // cờ địa chỉ data
+    logic is_ledr_access;   // cờ địa chỉ led đỏ
+    logic is_ledg_access;   // cờ địa chỉ led xanh
+    logic is_hex0_3_access; // cờ địa chỉ 4 cái led 7 đoạn 0 đến 3 
+    logic is_hex4_7_access; // cờ địa chỉ 4 cái led 7 đoạn 4 đến 7 
+    logic is_lcd_access;    // cờ địa chỉ lcd
+    logic is_sw_access;     // cờ địa chỉ sw
 
-    always_comb begin
-        mem_sel     = (i_lsu_addr >= 32'h0000_0000) && (i_lsu_addr <= 32'h0000_07FF);
-        ledr_sel    = (i_lsu_addr >= 32'h1000_0000) && (i_lsu_addr <= 32'h1000_0FFF);
-        ledg_sel    = (i_lsu_addr >= 32'h1000_1000) && (i_lsu_addr <= 32'h1000_1FFF);
-        hex_lo_sel  = (i_lsu_addr >= 32'h1000_2000) && (i_lsu_addr <= 32'h1000_2FFF);
-        hex_hi_sel  = (i_lsu_addr >= 32'h1000_3000) && (i_lsu_addr <= 32'h1000_3FFF);
-        lcd_sel     = (i_lsu_addr >= 32'h1000_4000) && (i_lsu_addr <= 32'h1000_4FFF);
-        sw_sel      = (i_lsu_addr >= 32'h1001_0000) && (i_lsu_addr <= 32'h1001_0FFF);
+    // Initialize memory (for simulation)
+    initial begin
+        data_memory <= '{default: 0};
+        lcd_reg = 0;
+        ledr_reg = 0;
+        ledg_reg = 0;
+        for (int i = 0; i < 8; i++) hex_reg[i] = 0;
     end
-// STORE
-    always_ff @(posedge i_clk) begin
-        if (i_reset) begin
-            o_io_ledr <= 32'd0;
-            o_io_ledg <= 32'd0;
-            o_io_lcd  <= 32'd0;
-            o_io_hex0 <= 7'd0;
-            o_io_hex1 <= 7'd0;
-            o_io_hex2 <= 7'd0;
-            o_io_hex3 <= 7'd0;
-            o_io_hex4 <= 7'd0;
-            o_io_hex5 <= 7'd0;
-            o_io_hex6 <= 7'd0;
-            o_io_hex7 <= 7'd0;
-        end else if (i_lsu_wren) begin
-            if (mem_sel)
-                mem[i_lsu_addr[9:2]] <= i_st_data;
-            else if (ledr_sel)
-                o_io_ledr <= i_st_data;
-            else if (ledg_sel)
-                o_io_ledg <= i_st_data;
-            else if (hex_lo_sel) begin
-                o_io_hex0 <= i_st_data[6:0];
-                o_io_hex1 <= i_st_data[14:8];
-                o_io_hex2 <= i_st_data[22:16];
-                o_io_hex3 <= i_st_data[30:24];
-            end else if (hex_hi_sel) begin
-                o_io_hex4 <= i_st_data[6:0];
-                o_io_hex5 <= i_st_data[14:8];
-                o_io_hex6 <= i_st_data[22:16];
-                o_io_hex7 <= i_st_data[30:24];
-            end else if (lcd_sel)
-                o_io_lcd <= i_st_data;
+
+    // Address Decoding Logic
+    always_comb begin
+        is_ram_access    = (i_addr[31:11] == 21'b0000_0000_0000_0000_0000_0);     // 0x0000_0000-0x0000_07FF
+        is_ledr_access   = (i_addr[31:12] == 20'h10000);     // 0x1000_0000-0x1000_0FFF
+        is_ledg_access   = (i_addr[31:12] == 20'h10001);     // 0x1000_1000-0x1000_1FFF
+        is_hex0_3_access = (i_addr[31:12] == 20'h10002);     // 0x1000_2000-0x1000_2FFF
+        is_hex4_7_access = (i_addr[31:12] == 20'h10003);     // 0x1000_3000-0x1000_3FFF
+        is_lcd_access    = (i_addr[31:12] == 20'h10004);     // 0x1000_4000-0x1000_4FFF
+        is_sw_access     = (i_addr[31:12] == 20'h10010);     // 0x1001_0000-0x1001_0FFF
+    end
+
+    // Read Logic
+    always_comb begin
+        o_rdata = 32'h0;
+        if (!i_wren) begin
+            case (1'b1)
+                is_ram_access: begin
+                    case (i_bmask)
+                        4'b0000: o_rdata = {{24{data_memory[i_addr[10:2]][7]}}, data_memory[i_addr[10:2]][7:0]};  // LB
+                        4'b0001: o_rdata = {24'h0, data_memory[i_addr[10:2]][7:0]};                              // LBU
+                        4'b0010: o_rdata = {{16{data_memory[i_addr[10:2]][15]}}, data_memory[i_addr[10:2]][15:0]}; // LH
+                        4'b0011: o_rdata = {16'h0, data_memory[i_addr[10:2]][15:0]};                              // LHU
+                        4'b0100: o_rdata = data_memory[i_addr[10:2]];                                             // LW
+                        default: o_rdata = 32'h0;
+                    endcase
+                end
+                is_ledr_access:   o_rdata = ledr_reg;
+                is_ledg_access:   o_rdata = ledg_reg;
+                is_hex0_3_access: o_rdata = {hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]};
+                is_hex4_7_access: o_rdata = {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4]};
+                is_lcd_access:    o_rdata = lcd_reg;
+                is_sw_access:     o_rdata = i_io_sw;
+                default:          o_rdata = 32'h0;
+            endcase
         end
     end
- // LOAD
-    always_comb begin
-        if (mem_sel)
-            o_ld_data = mem[i_lsu_addr[9:2]];
-        else if (sw_sel)
-            o_ld_data = i_io_sw;
-        else
-            o_ld_data = 32'd0;
+
+    // Write Logic (Synchronous)
+    always_ff @(posedge i_clk) begin
+        if (!i_reset) begin
+            data_memory <= '{default: 0};
+            lcd_reg <= 0;
+            ledr_reg <= 0;
+            ledg_reg <= 0;
+            for (int i = 0; i < 8; i++) hex_reg[i] <= 0;
+        end
+        else if (i_wren) begin
+            case (1'b1)
+                is_ram_access: begin
+                    case (i_bmask)
+                        4'b1000: data_memory[i_addr[10:2]][7:0] <= i_wdata[7:0];    // SB
+                        4'b1001: data_memory[i_addr[10:2]][15:0] <= i_wdata[15:0];  // SH
+                        4'b1010: data_memory[i_addr[10:2]] <= i_wdata;              // SW
+                        default: ; // Ignore
+                    endcase
+                end
+                is_ledr_access:   ledr_reg <= i_wdata;
+                is_ledg_access:   ledg_reg <= i_wdata;
+                is_hex0_3_access: {hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]} <= i_wdata;
+                is_hex4_7_access: {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4]} <= i_wdata;
+                is_lcd_access:    lcd_reg <= i_wdata;
+                default: ; // Ignore other writes
+            endcase
+        end
     end
+
+    // Connect I/O Outputs
+    assign o_io_ledr = ledr_reg;
+    assign o_io_ledg = ledg_reg;
+    assign o_io_lcd  = lcd_reg;
+    assign {o_io_hex7, o_io_hex6, o_io_hex5, o_io_hex4, o_io_hex3, o_io_hex2, o_io_hex1, o_io_hex0} = 
+           {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4], hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]};
 
 endmodule
