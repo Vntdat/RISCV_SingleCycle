@@ -4,7 +4,7 @@ module imem (
 );
     logic [31:0] memory [0:8191];
     initial begin
-        $readmemh("E:/BKHCM/HK 242/CTMT/singlecycle/isa.mem", memory);  // file imem.mem chứa mã lệnh hex
+        $readmemh("/home/cpa/ca111/sc-test/02_test/isa.mem", memory);  // file imem.mem chứa mã lệnh hex
     end
     always_comb begin
         o_inst = memory[i_addr[14:2]];
