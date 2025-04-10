@@ -86,7 +86,7 @@ module lsu (
 
     // Write Logic (Synchronous)
     always_ff @(posedge i_clk) begin
-        if (!i_reset) begin
+        if (i_reset) begin
             data_memory <= '{default: 0};
             lcd_reg <= 0;
             ledr_reg <= 0;
