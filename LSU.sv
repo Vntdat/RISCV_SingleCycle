@@ -27,7 +27,7 @@ module lsu (
     logic [31:0] lcd_reg;              // LCD Control Register
     logic [31:0] ledr_reg;             // Red LEDs
     logic [31:0] ledg_reg;             // Green LEDs
-    logic [6:0]  hex_reg [0:7];        // 7-segment displays
+    logic [31:0]  hex_reg [0:1];        // 7-segment displays
 
     // Address Decoding
     logic is_ram_access;    // cờ địa chỉ data
@@ -40,11 +40,12 @@ module lsu (
 
     // Initialize memory (for simulation)
     initial begin
-        data_memory <= '{default: 0};
-        lcd_reg = 0;
-        ledr_reg = 0;
-        ledg_reg = 0;
-        for (int i = 0; i < 8; i++) hex_reg[i] = 0;
+        $readmemh("C:/Users/dell/Desktop/mem.dump", data_memory);
+        lcd_reg <= 0;
+        ledr_reg <= 0;
+        ledg_reg <= 0;
+        hex_reg[0] <= 0;
+		  hex_reg[1] <= 1;
     end
 
     // Address Decoding Logic
@@ -75,8 +76,8 @@ module lsu (
                 end
                 is_ledr_access:   o_rdata = ledr_reg;
                 is_ledg_access:   o_rdata = ledg_reg;
-                is_hex0_3_access: o_rdata = {hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]};
-                is_hex4_7_access: o_rdata = {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4]};
+                is_hex0_3_access: o_rdata = hex_reg[0];
+                is_hex4_7_access: o_rdata = hex_reg[1];
                 is_lcd_access:    o_rdata = lcd_reg;
                 is_sw_access:     o_rdata = i_io_sw;
                 default:          o_rdata = 32'h0;
@@ -91,7 +92,8 @@ module lsu (
             lcd_reg <= 0;
             ledr_reg <= 0;
             ledg_reg <= 0;
-            for (int i = 0; i < 8; i++) hex_reg[i] <= 0;
+            hex_reg[0] <= 0;
+	    hex_reg[1] <= 1;
         end
         else if (i_wren) begin
             case (1'b1)
@@ -105,8 +107,8 @@ module lsu (
                 end
                 is_ledr_access:   ledr_reg <= i_wdata;
                 is_ledg_access:   ledg_reg <= i_wdata;
-                is_hex0_3_access: {hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]} <= i_wdata;
-                is_hex4_7_access: {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4]} <= i_wdata;
+                is_hex0_3_access: hex_reg[0] <= i_wdata;
+                is_hex4_7_access: hex_reg[1] <= i_wdata;
                 is_lcd_access:    lcd_reg <= i_wdata;
                 default: ; // Ignore other writes
             endcase
@@ -117,7 +119,13 @@ module lsu (
     assign o_io_ledr = ledr_reg;
     assign o_io_ledg = ledg_reg;
     assign o_io_lcd  = lcd_reg;
-    assign {o_io_hex7, o_io_hex6, o_io_hex5, o_io_hex4, o_io_hex3, o_io_hex2, o_io_hex1, o_io_hex0} = 
-           {hex_reg[7], hex_reg[6], hex_reg[5], hex_reg[4], hex_reg[3], hex_reg[2], hex_reg[1], hex_reg[0]};
-
+    assign o_io_hex0 = hex_reg[0][6:0];
+	 assign o_io_hex1 = hex_reg[0][14:8];
+	 assign o_io_hex2 = hex_reg[0][22:16];
+	 assign o_io_hex3 = hex_reg[0][30:24];
+	 assign o_io_hex4 = hex_reg[1][6:0];
+	 assign o_io_hex5 = hex_reg[1][14:8];
+	 assign o_io_hex6 = hex_reg[1][22:16];
+	 assign o_io_hex7 = hex_reg[1][30:24];
+	 
 endmodule
