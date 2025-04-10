@@ -5,9 +5,9 @@ module controlunit (
 		
 		//tin hieu ngo ra
 		output logic pc_sel, rd_wren, br_un, opa_sel, opb_sel, mem_wren,
-		
 		output logic [3:0] alu_op,
-		output logic [1:0] wb_sel
+		output logic [1:0] wb_sel,
+		output logic [3:0] lsu_op
 );
 		// khai bao cac tin hieu can
 		logic [4:0] opcode;
@@ -31,7 +31,7 @@ module controlunit (
 				mem_wren  = 1'b0;    // read alu (load)
 				alu_op    = 4'b0000; // add
 				wb_sel    = 2'b00;   // alu_data
-				
+				lsu_op = 4'b0100;		//lW
 				
 		// dua tren opcode de phan biec cac loai lenh R, I, S, B, U, J
 		
@@ -43,7 +43,6 @@ module controlunit (
 					opa_sel = 1'b0;
 					opb_sel = 1'b0; //rs2
 					wb_sel  = 2'b00; //alu_data
-				
 								case  (fun3)
 										3'b000: begin
 															case  (fun7)
@@ -72,7 +71,7 @@ module controlunit (
 					opa_sel = 1'b0;
 					opb_sel = 1'b1; //imm
 					wb_sel  = 2'b00; //alu_data
-					
+				
 									case (fun3)
 											3'b000: alu_op = 4'b0000; // lenh ADDI
 											3'b001: alu_op = 4'b0111; // lenh SLLI
@@ -95,7 +94,7 @@ module controlunit (
     opb_sel   = 1'b1; // imm
     rd_wren   = 1'b0;
     mem_wren  = 1'b0;
-    
+
 
     // Xác định br_un phụ thuộc vào fun3
     case (br_unte)
@@ -105,12 +104,12 @@ module controlunit (
 
     // Gán pc_sel tách biệt
     case (fun3)
-        3'b000: pc_sel = br_equal;        // BEQ
-        3'b001: pc_sel = !br_equal;       // BNE
-        3'b100: pc_sel = br_less;         // BLT
-        3'b101: pc_sel = !br_less;        // BGE
-        3'b110: pc_sel = br_less;         // BLTU
-        3'b111: pc_sel = !br_less;        // BGEU
+        3'b000: pc_sel = br_equal;        // BEQ so sánh bằng có dấu
+        3'b001: pc_sel = !br_equal;       // BNE so sánh không bằng có dấu
+        3'b100: pc_sel = br_less;         // BLT nhảy nếu rs1 < rs2 có dấu
+        3'b101: pc_sel = !br_less;        // BGE nhảy nếu rs >= rs2 có dấu
+        3'b110: pc_sel = br_less;         // BLTU nhảy nếu rs1 < rs2 ko dấu
+        3'b111: pc_sel = !br_less;        // BGEU nhảy nếu rs1 >= rs2 ko dấu
         default: begin
 		  end
     endcase
@@ -124,6 +123,13 @@ end
 					mem_wren = 1'b1;
 					wb_sel   = 2'b01; //lsu
 				
+					case (fun3)
+							3'b000: lsu_op = 4'b1000; //SB
+							3'b001: lsu_op = 4'b1001; //SH
+							3'b010: lsu_op = 4'b1010; //SW
+							default: begin
+										end
+					endcase
 							 end
 				// I_Format lenh Load doc du leu tu LSU
 				5'b00000: begin
@@ -134,6 +140,15 @@ end
 					mem_wren = 1'b0;
 					wb_sel   = 2'b01; //lsu	
 				
+					case (fun3)
+							3'b000: lsu_op = 4'b0000; //LB
+							3'b001: lsu_op = 4'b0010; //LH
+							3'b010: lsu_op = 4'b0100; //LW
+							3'b100: lsu_op = 4'b0001; //LBU
+							3'b101: lsu_op = 4'b0011; //LHU
+							default: begin
+										end
+					endcase
 							 end			
 				//U_Format lenh nhay khong dieu kien
 				5'b11011: begin   //lenh JAL
@@ -143,7 +158,7 @@ end
 					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
 					wb_sel   = 2'b10; //pc+4
-					
+				
 							 end
 				5'b11001: begin 	//lenh JALR
 					pc_sel   = 1'b1;
@@ -152,7 +167,6 @@ end
 					opb_sel  = 1'b1; //imm
 					mem_wren = 1'b0;
 					wb_sel   = 2'b10; //pc+4
-				
 							end
 				//I_Format 
 				//lenh LUI
@@ -162,6 +176,7 @@ end
 					mem_wren = 1'b0;
 					opb_sel  = 1'b1;
 					wb_sel   = 2'b11;  // sửa ở trong hình anh Hải cho thêm phần nối từ immgen đến mux 4 sang 1
+					
 						end
 				//lenh AUIPC
 				5'b00101: begin
