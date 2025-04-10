@@ -166,9 +166,9 @@ module singlecycle (
 
     // Write-back multiplexer
     mux4_1_32bit wb (
-        .a (pc_four),
-        .b (alu_data),
-        .c (ld_data),
+	    .a (alu_data),
+	    .b (ld_data),
+	    .c (pc_four),
         .d (immediate),
         .s (wb_sel),
         .y (wb_data)
