@@ -135,11 +135,12 @@ module lsu (
             // Initialize memory if needed
             // $readmemh("mem.dump", data_memory);
         end
-        else if (i_wren) begin
+        else if (i_wren && !addr_misaligned) begin
             case (1'b1)
                 is_ram_access: begin
                     case (i_bmask)
                         // sb - store byte
+<<<<<<< HEAD
                         4'b1000: 
 case (i_addr[1:0]) 
 2'b00: data_memory[i_addr[14:2]][7:0] <= i_wdata[7:0];
@@ -156,6 +157,17 @@ case (i_addr[1:0])
                           default: ;
 endcase
                       
+=======
+                        4'b1000: data_memory[i_addr[14:2]][7:0] <= i_wdata[7:0];
+                        // sh - store half-word
+                        4'b1001: begin
+                            if (i_addr[1] == 1'b0) begin
+                                data_memory[i_addr[14:2]][15:0] <= i_wdata[15:0];
+                            end else begin
+                                data_memory[i_addr[14:2]][31:16] <= i_wdata[15:0];
+                            end
+                        end
+>>>>>>> 6e8de79a09b2e48afe099dd47f8562613341c76c
                         // sw - store word
                         4'b1010: data_memory[i_addr[14:2]] <= i_wdata;
                         default: ; // Ignore
