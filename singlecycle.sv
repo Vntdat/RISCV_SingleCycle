@@ -43,6 +43,7 @@ module singlecycle (
     logic [31:0] alu_data;
     logic [31:0] ld_data;
     logic [31:0] wb_data;
+    logic [3:0] lsu_op;
 
     // Debugging output
     assign o_pc_debug = pc;
@@ -101,12 +102,13 @@ module singlecycle (
 
     // LSU (Load/Store Unit)
     lsu lsu (
-        .i_clk         (i_clk),
-        .i_reset       (i_reset),
-        .i_lsu_addr    (alu_data),
-        .i_st_data     (rs2_data),
-        .i_lsu_wren    (mem_wren),
-        .o_ld_data     (ld_data),
+		.i_clk 	(i_clk),
+		.i_reset (i_reset),
+		.i_addr 	(alu_data),
+		.i_wdata (rs2_data),
+		.i_bmask (lsu_op),
+		.i_wren	(mem_wren),
+		.o_rdata (ld_data),
         .o_io_ledr     (o_io_ledr),
         .o_io_ledg     (o_io_ledg),
         .o_io_hex0     (o_io_hex0),
@@ -144,7 +146,8 @@ module singlecycle (
         .opb_sel    (opb_sel),
         .mem_wren   (mem_wren),
         .alu_op     (alu_op),
-        .wb_sel     (wb_sel)
+        .wb_sel     (wb_sel),
+	.lsu_op      (lsu_op)
     );
 
     // Memory unit (for fetching instructions)
@@ -153,28 +156,21 @@ module singlecycle (
 	.o_inst (instr)
 	);
 
-    // Program counter (PC) register
-    pc_reg pc_reg (
-        .i_clk       (i_clk),
-        .i_reset     (i_reset),
-        .i_pc_next   (pc_next),
-        .o_pc        (pc)
-    );
-
-    // PC multiplexer
-    mux2_1_32bit pc_mux (
-        .a (pc_four),
-        .b (alu_data),
-        .s (pc_sel),
-        .y (pc_next)
-    );
-
-    // Full adder for PC + 4
-    fulladder_32 pc_adder (
-        .a   (pc),
-        .b   (32'd4),
-        .sum (pc_four)
-    );
+   assign pc_four = pc + 32'd4;
+    //mux-PC source
+    always_comb begin
+        if (pc_sel) begin //PC4-0 and ALU_DATA-1
+            pc_next = alu_data;
+        end
+        else begin
+            pc_next = pc_four;
+        end
+    end
+    //PC counter
+    always_ff @(posedge i_clk) begin
+        if (i_reset) pc <= 32'h0;
+        else pc <= pc_next;
+    end
 
     // Write-back multiplexer
     mux4_1_32bit wb (

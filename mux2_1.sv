@@ -5,6 +5,6 @@ module mux2_1 (
 	output logic y
 	);
 
-	assign y = (~s&a) | (s&b);
+	assign y = s ? b : a;
 
 endmodule
